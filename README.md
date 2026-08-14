@@ -16,11 +16,12 @@ and embed a compatible ios_system build.
 ## Private package access
 
 Until this repository is public, the package source is cloned over SSH and the
-release archive is downloaded over HTTPS. Configure a fine-grained GitHub token
-with Contents read access for this repository in `~/.netrc`:
+release archive is downloaded through GitHub's release-assets API over HTTPS.
+Configure a fine-grained GitHub token with Contents read access for this
+repository in `~/.netrc`:
 
 ```netrc
-machine github.com
+machine api.github.com
   login token
   password <fine-grained-personal-access-token>
 ```
@@ -44,7 +45,9 @@ The command builds all supported slices and writes these ignored artifacts:
 - `.build/ripgrep_ios.xcframework.zip`
 - `.build/release.md`
 
-For each release, upload the generated ZIP under the matching semantic-version
-tag and set `Package.swift` to the checksum reported in `release.md` (or by
-`swift package compute-checksum`). The tag, release URL, archive, and manifest
-checksum must all agree.
+For each release, upload the generated ZIP to a draft GitHub release, retrieve
+the asset ID, and use its API URL in `Package.swift`. Append `.zip` to the
+numeric asset ID so SwiftPM recognizes the archive; GitHub still resolves the
+same asset and SwiftPM requests its binary representation. Set the checksum to
+the value reported in `release.md` (or by `swift package compute-checksum`),
+then commit, tag, and publish the release.
