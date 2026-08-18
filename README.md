@@ -13,22 +13,16 @@ the app is `rg_main`.
 The framework links `ios_system.framework` at runtime. Consumers must also link
 and embed a compatible ios_system build.
 
-## Private package access
+## Installation
 
-Until this repository is public, the package source is cloned over SSH and the
-release archive is downloaded through GitHub's release-assets API over HTTPS.
-Configure a fine-grained GitHub token with Contents read access for this
-repository in `~/.netrc`:
+Add this repository as a Swift package dependency:
 
-```netrc
-machine api.github.com
-  login token
-  password <fine-grained-personal-access-token>
+```text
+https://github.com/kitknox/ripgrep-rootshell.git
 ```
 
-Protect the file with `chmod 600 ~/.netrc`. Do not commit credentials to this
-repository. For command-line Xcode builds, select netrc explicitly with
-`-packageAuthorizationProvider netrc`.
+Select the `ripgrep_ios` library product. Releases use standard public GitHub
+asset URLs, so consumers do not need a GitHub token or `.netrc` configuration.
 
 ## Building a release
 
@@ -45,9 +39,7 @@ The command builds all supported slices and writes these ignored artifacts:
 - `.build/ripgrep_ios.xcframework.zip`
 - `.build/release.md`
 
-For each release, upload the generated ZIP to a draft GitHub release, retrieve
-the asset ID, and use its API URL in `Package.swift`. Append `.zip` to the
-numeric asset ID so SwiftPM recognizes the archive; GitHub still resolves the
-same asset and SwiftPM requests its binary representation. Set the checksum to
-the value reported in `release.md` (or by `swift package compute-checksum`),
-then commit, tag, and publish the release.
+For each release, set the versioned GitHub release-download URL in
+`Package.swift` and use the checksum reported in `release.md` (or by
+`swift package compute-checksum`). Commit the manifest, tag that commit, and
+publish a GitHub release with `ripgrep_ios.xcframework.zip` attached.
